@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+	
+		<link rel="stylesheet" type="text/css" href="css/tetris.css" />
+	
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/tetris-tools.js"></script>
+		<script type="text/javascript" src="js/tetris-pieces.js"></script>
+		<script type="text/javascript" src="js/tetris-lines.js"></script>
+		<script type="text/javascript" src="js/tetris-score.js"></script>
+		
+		<script type="text/javascript">
+		
+			var HELP_DELAY = 1500;
+			var HELP_TIMER = -1;
+		
+			var SCORE_1 = 0;
+			var SCORE_2 = 0;
+			var SCORE_3 = 0;
+			var SCORE_4 = 0;
+			var SCORE_5 = 0;
+			
+			var SCORE_NAME_DEFAULT = "-------";
+			
+			var SCORE_1_NAME = SCORE_NAME_DEFAULT;
+			var SCORE_2_NAME = SCORE_NAME_DEFAULT;
+			var SCORE_3_NAME = SCORE_NAME_DEFAULT;
+			var SCORE_4_NAME = SCORE_NAME_DEFAULT;
+			var SCORE_5_NAME = SCORE_NAME_DEFAULT;
+		
+			var ENTER_NAME_DEFAULT_CHAR = "-";
+			var ENTER_NAME_MAX_CHAR = 7;
+			var ENTER_NAME = -1;
+			var ENTER_NAME_POSITION = 0;
+			var ENTER_NAME_DELAY = 300;
+			var ENTER_NAME_TIMER = -1;
+		
+			var GAME_OVER = false;
+			var GAME_PAUSE = false;
+			var GAME_SPECIAL_AUTHORIZED = false;
+			var GAME_START_DELAY = 650;
+			var GAME_START_TIMER = -1;
+		
+			var LINES = "";
+			var LINES_BLINK_COUNTER = 0;
+			var LINES_BLINK_TIMER = -1;
+			var LINES_BLINK_DELAY = 200;
+			var LINES_BLINK_MAX = 5;
+			var LINES_MAX_X = 10;
+			var LINES_MAX_Y = 18;
+		
+			var PIECE_NEXT = -1;
+			var PIECE_NEXT_MASKED = false;
+			var PIECE_CONTROL = "NULL";
+			var PIECE_DOWN_TIMER = -1;
+			var PIECE_DISABLED_TIMER = -1;
+			var PIECE_DISABLED_DELAY = 10;
+			var PIECE_DISABLED_X = -1;
+			var PIECE_DISABLED_Y = -1;
+			var PIECE_START_X = (LINES_MAX_X / 2) + 1;
+			var PIECE_START_Y = (LINES_MAX_Y - 2);
+			
+			var PLAYER_LEVEL = 0;
+			var PLAYER_LINES = 0;
+			var PLAYER_LINES_LEVEL = 0;
+			var PLAYER_SCORE = 0;
+			var PLAYER_SCORE_BONUS = 0;
+			var PLAYER_SPEED_DEFAULT = 1000;
+			var PLAYER_SPEED = PLAYER_SPEED_DEFAULT;
+			var PLAYER_SPEED_DELAY = 97;
+		
+			function initBoard() { 
+				for (var y = LINES_MAX_Y, ymax = 0; y > ymax; y --) { 
+					for (var x = 1, xmax = LINES_MAX_X + 1; x < xmax; x ++) { 
+						$('#board').append('<div class="square" id="s-' + y + '-' + x + '"></div>');
+					}
+				}
+				for (var y = 4, ymax = 0; y > ymax; y --) { 
+					for (var x = 1, xmax = 5; x < xmax; x ++) { 
+						$('#board-next').append('<div class="square" id="next-s-' + y + '-' + x + '"></div>');
+					}
+				}
+
+				refreshPlayer();
+			}
+			
+			function resetAll() { 
+				$('#board').find('.square').remove();
+				$('#board-next').find('.square').remove();
+			
+				PLAYER_LEVEL = 0;
+				PLAYER_LINES = 0;
+				PLAYER_LINES_LEVEL = 0;
+				PLAYER_SCORE = 0;
+				PLAYER_SCORE_BONUS = 0;
+				PLAYER_SPEED = PLAYER_SPEED_DEFAULT;
+				
+				PIECE_NEXT = -1;
+				
+				GAME_OVER = false;
+				GAME_PAUSE = false;
+				GAME_SPECIAL_AUTHORIZED = false;
+				
+				initBoard();
+				
+			}
+			
+			function gameover() { 
+				GAME_SPECIAL_AUTHORIZED = false;
+				PIECE_CONTROL = "NULL";
+				
+				PIECE_DISABLED_Y = 1;
+				PIECE_DISABLED_X = 1;
+				PIECE_DISABLED_TIMER = setInterval('disablePiece()', PIECE_DISABLED_DELAY);
+			}
+			
+			function pause() { 
+				if (GAME_PAUSE) { 
+					$('#board, #board-next').find(".square").removeClass("invisible");
+					clearMessage();
+					GAME_PAUSE = false;
+					PIECE_DOWN_TIMER = setInterval('pieceDown()', PLAYER_SPEED);
+					if (LINES !== "") { 
+						LINES_BLINK_TIMER = setInterval('blinkLines()', LINES_BLINK_DELAY);
+					}
+				} else { 
+					message("pause");
+					GAME_PAUSE = true;
+					clearInterval(PIECE_DOWN_TIMER);
+					if (LINES !== "") { 
+						clearInterval(LINES_BLINK_TIMER);
+					}
+					$('#board, #board-next').find(".square").addClass("invisible");
+				}
+			}
+			
+			function startOneGame() { 
+				GAME_SPECIAL_AUTHORIZED = true;
+				clearMessage();
+				launchOnePiece();
+			}
+			
+			function blinkHelp() { 
+				if ( $('.help-button').attr("class").indexOf("yo") > -1 ) { 
+					$('.help-button').removeClass("yo");
+				} else { 
+					$('.help-button').addClass("yo");
+				}
+			}
+			
+			function blinkStart() { 
+				if ( $('#home .start').attr("class").indexOf("invisible") > -1 ) { 
+					$('#home .start').removeClass("invisible");
+				} else { 
+					$('#home .start').addClass("invisible");
+				}
+			}
+			
+			function blinkName() { 
+				if ( $('#home #name' + ENTER_NAME).attr("class") && $('#home #name' + ENTER_NAME).attr("class").indexOf("invisible") > -1 ) { 
+					$('#home #position' + ENTER_NAME + ', #home #score' + ENTER_NAME + ', #home #name' + ENTER_NAME).removeClass("invisible");
+				} else { 
+					$('#home #position' + ENTER_NAME + ', #home #score' + ENTER_NAME + ', #home #name' + ENTER_NAME).addClass("invisible");
+				}
+			}
+			
+			function home() { 
+				$("#panel").hide();
+				$("#home").show();
+				
+				if (ENTER_NAME > -1) { 
+					ENTER_NAME_TIMER = setInterval('blinkName()', ENTER_NAME_DELAY);
+				} else { 
+					GAME_START_TIMER = setInterval('blinkStart()', GAME_START_DELAY);
+				}
+			}
+			
+			function game() { 
+				$("#home").hide();
+				$("#panel").show();
+				
+				clearInterval(GAME_START_TIMER);
+				GAME_START_TIMER = -1;
+				resetAll();
+				startOneGame();
+			}
+			
+			$(document).ready(function() { 
+				
+				HELP_TIMER = setInterval('blinkHelp()', HELP_DELAY);
+				
+				home();
+				
+				$(".help-button, #help").click(function(e) { 
+					if ( $('#help').css("display") === "none") { 
+						$('#help').fadeIn("slow");
+						$(".help-button").hide();
+						if ( $("#panel").css("display") !== "none" && !GAME_OVER && GAME_SPECIAL_AUTHORIZED && !GAME_PAUSE) { 
+							pause();
+						}
+					} else { 
+						$('#help').fadeOut("slow");
+						$(".help-button").show();
+					}
+				});
+
+				
+				$("body").keyup(function(e) { 
+					if ( $("#panel").css("display") !== "none") { 
+						if (e.keyCode === 40) { 
+							PLAYER_SCORE_BONUS = 0;
+						}
+					}
+				});
+				
+				$("body").keydown(function(e) { 
+					if ( $("#help").css("display") !== "none" ) { 
+						$('#help').fadeOut("slow");
+						$(".help-button").show();
+					} else { 				
+						if ( $("#panel").css("display") === "none" ) { 
+							if ( ENTER_NAME_TIMER > -1 ) { 
+								if (e.keyCode === 8 && ENTER_NAME_POSITION > 0) { 
+									ENTER_NAME_POSITION --;
+									var n = $('#home #name' + ENTER_NAME).html();
+									n = n.replaceAt(ENTER_NAME_POSITION, ENTER_NAME_DEFAULT_CHAR);
+									$('#home #name' + ENTER_NAME).html(n);
+								} else if (e.keyCode >= 65 && e.keyCode <= 90 && ENTER_NAME_POSITION < ENTER_NAME_MAX_CHAR) { 
+									var n = $('#home #name' + ENTER_NAME).html();
+									n = n.replaceAt(ENTER_NAME_POSITION, String.fromCharCode(e.keyCode));
+									$('#home #name' + ENTER_NAME).html(n);
+									ENTER_NAME_POSITION ++;
+								} else if (e.keyCode === 13) { 
+									var n = $('#home #name' + ENTER_NAME).html();
+									$('#home #name' + ENTER_NAME).html(n.split(ENTER_NAME_DEFAULT_CHAR).join(''));
+									eval('SCORE_' + ENTER_NAME + '_NAME = n.split("' + ENTER_NAME_DEFAULT_CHAR + '").join("");');
+									clearInterval(ENTER_NAME_TIMER);
+									$('#home #position' + ENTER_NAME + ', #home #score' + ENTER_NAME + ', #home #name' + ENTER_NAME).removeClass("invisible");
+									ENTER_NAME = -1;
+									ENTER_NAME_TIMER = -1;
+									ENTER_NAME_POSITION = 0;
+									home();
+								}
+							} else { 
+								game();
+							}
+						} else { 
+							if (GAME_OVER) { 
+								home();
+							} else { 
+								if ( (e.keyCode === 27 || e.keyCode === 19 || e.keyCode === 13 || e.keyCode === 80) && GAME_SPECIAL_AUTHORIZED) { 
+									pause();
+								}
+							
+								if ( PIECE_CONTROL !== "NULL" && !GAME_PAUSE ) { 
+								
+									if (e.keyCode === 46 || e.keyCode === 8) { 
+										nextMasked();
+									}
+								
+									var c = getPieceControlId();
+									var y = getPieceControlPositionY();
+									var x = getPieceControlPositionX();
+									var p = getPieceControlType();
+									var m = getPieceControlRotate();
+											
+									if (e.keyCode === 40) { 
+										y --;
+										PLAYER_SCORE_BONUS ++;
+										pieceDown();
+									} else { 							
+										if (e.keyCode === 39) { 
+											x ++;
+										} else if (e.keyCode === 37) { 
+											x --;
+										} else if (e.keyCode === 83 || e.keyCode === 38 || e.keyCode === 17 || e.keyCode === 32) { 
+											m ++; if (m > 4) m = 1;
+										} else if (e.keyCode === 81 || e.keyCode === 65) { 
+											m --; if (m < 1) m = 4;
+										}
+
+										if (canMove(p, x, y, m, PIECE_CONTROL)) { 
+											$('#board').find(".square[piece-id='" + PIECE_CONTROL + "']").removeClass("piece" + p).removeAttr("piece-id").removeAttr("piece-catch").removeAttr("piece-move");
+											drawPiece(p, x, y, m, PIECE_CONTROL);
+											$('#board').find(".square[piece-id='" + PIECE_CONTROL + "'][piece-catch='yes']").attr("piece-move", m);
+										}
+									}
+								}
+							}
+						}
+					}
+				});
+			});
+		</script>
+	
+		<title>Tetris</title>
+	</head>
+		
+	<body>
+	
+		<div id="help">
+			<h2>Help</h2>
+			<table align="center" border="0" cellPadding="2" cellSpacing="0">
+				<tbody>
+					<tr><td>Arrow Left / Arrow Right : </td><td>Move Left / Move Right</td></tr>
+					<tr><td>Arrow Down : </td><td>Move Down</td></tr>
+					<tr><td>Arrow Up, CTRL, Space, S : </td><td>Rotate Right</td></tr>
+					<tr><td>Q, A : </td><td>Rotate Left</td></tr>
+					<tr><td colspan="2">&nbsp;</td></tr>
+					<tr><td>ESCAPE, ENTER, P : </td><td>PAUSE</td></tr>
+					<tr><td>DELETE, BACKSPACE : </td><td>SHOW / HIDE NEXT PIECE</td></tr>
+				</tbody>
+			</table>
+		</div>
+	
+		<div id="home">
+			<h1>Tetris</h1>
+			<h2>Lucio PANEPINTO</h2>
+			<h3>2014</h3>
+			<span class="start invisible">- Press a button to start -</span>
+			<div id="scores">
+				<h2>High scores</h2>
+				<table align="center" border="0" cellPadding="2" cellSpacing="0">
+					<thead>
+						<tr><th>Rank</th><th>Score</th><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Name</th></tr>
+					</thead>
+					<tbody>
+						<tr><td id="position1">1ST</td><td id="score1">0</td><td id="name1">-------</td></tr>
+						<tr><td id="position2">2ND</td><td id="score2">0</td><td id="name2">-------</td></tr>
+						<tr><td id="position3">3RD</td><td id="score3">0</td><td id="name3">-------</td></tr>
+						<tr><td id="position4">4TH</td><td id="score4">0</td><td id="name4">-------</td></tr>
+						<tr><td id="position5">5TH</td><td id="score5">0</td><td id="name5">-------</td></tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="help-button">- help -</div>
+		</div>
+	
+		<div id="panel">
+			<h1>Tetris</h1>
+			<div id="board"></div>
+			<div id="level">
+				<h2>Level</h2>
+				<span></span>
+			</div>
+			<div id="lines">
+				<h2>Lines</h2>
+				<span></span>
+			</div>
+			<div id="score">
+				<h2>Score</h2>
+				<span></span>
+			</div>
+			<div id="next">
+				<h2>Next</h2>
+				<span>
+					<div id="board-next"></div>
+				</span>
+			</div>
+			<div class="help-button">- help -</div>
+		</div>
+	
+	</body>
+	
+</html>
