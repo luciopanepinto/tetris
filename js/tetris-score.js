@@ -2,8 +2,6 @@ function refreshPlayer() {
 	$("#level span").html(PLAYER_LEVEL);
 	$("#lines span").html(commafy(PLAYER_LINES));
 	$("#score span").html(commafy(PLAYER_SCORE));
-	
-	
 }
 
 function refreshHighScores() { 
@@ -34,6 +32,14 @@ function refreshHighScores() {
 	$("#score3").html(commafy(SCORE_3)); $("#name3").html(SCORE_3_NAME);
 	$("#score4").html(commafy(SCORE_4)); $("#name4").html(SCORE_4_NAME);
 	$("#score5").html(commafy(SCORE_5)); $("#name5").html(SCORE_5_NAME);
+	
+	if ( $("#control").css("display") !== "none" ) { 
+		$("#name" + ENTER_NAME).html('<input type="text" id="name-input" name="name-input" size="10" maxlength="7">');
+		setTimeout(function() { $('#name-input').get(0).focus() }, 2000);
+		$("#name-input").tap(function(e) { 
+			e.stopPropagation();
+		});
+	}
 }
 
 function scoringLines(l) { 

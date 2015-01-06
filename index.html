@@ -4,9 +4,12 @@
 
 	<head>
 	
+		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+	
 		<link rel="stylesheet" type="text/css" href="css/tetris.css" />
 	
 		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/jquery-mobile.js"></script>
 		<script type="text/javascript" src="js/tetris-tools.js"></script>
 		<script type="text/javascript" src="js/tetris-pieces.js"></script>
 		<script type="text/javascript" src="js/tetris-lines.js"></script>
@@ -160,10 +163,16 @@
 			}
 			
 			function blinkName() { 
-				if ( $('#home #name' + ENTER_NAME).attr("class") && $('#home #name' + ENTER_NAME).attr("class").indexOf("invisible") > -1 ) { 
-					$('#home #position' + ENTER_NAME + ', #home #score' + ENTER_NAME + ', #home #name' + ENTER_NAME).removeClass("invisible");
+				if ( $('#home #score' + ENTER_NAME).attr("class") && $('#home #score' + ENTER_NAME).attr("class").indexOf("invisible") > -1 ) { 
+					$('#home #position' + ENTER_NAME + ', #home #score' + ENTER_NAME).removeClass("invisible");
+					if ( $("#control").css("display") === "none" ) { 
+						$('#home #name' + ENTER_NAME).removeClass("invisible");
+					}
 				} else { 
-					$('#home #position' + ENTER_NAME + ', #home #score' + ENTER_NAME + ', #home #name' + ENTER_NAME).addClass("invisible");
+					$('#home #position' + ENTER_NAME + ', #home #score' + ENTER_NAME).addClass("invisible");
+					if ( $("#control").css("display") === "none" ) { 
+						$('#home #name' + ENTER_NAME).addClass("invisible");
+					}
 				}
 			}
 			
@@ -172,6 +181,7 @@
 				$("#home").show();
 				
 				if (ENTER_NAME > -1) { 
+					$('#home .start').addClass("invisible");
 					ENTER_NAME_TIMER = setInterval('blinkName()', ENTER_NAME_DELAY);
 				} else { 
 					GAME_START_TIMER = setInterval('blinkStart()', GAME_START_DELAY);
@@ -189,6 +199,10 @@
 			}
 			
 			$(document).ready(function() { 
+				$.mobile.loading().hide();
+				if ($("#control").css("display") !== "none") { 
+					$("#home .start").html(" - Touch screen to start - ");
+				}
 				
 				HELP_TIMER = setInterval('blinkHelp()', HELP_DELAY);
 				
@@ -207,7 +221,6 @@
 					}
 				});
 
-				
 				$("body").keyup(function(e) { 
 					if ( $("#panel").css("display") !== "none") { 
 						if (e.keyCode === 40) { 
@@ -216,6 +229,38 @@
 					}
 				});
 				
+				$("#home, #panel #board").tap(function(e) { 
+					simulateKeydown(13);
+				});
+				$("#board-next").tap(function(e) { 
+					simulateKeydown(46);
+				});
+				
+				$("#control div.move-right").tap(function(e) { 
+					simulateKeydown(39);
+				});
+				$("#control div.move-left").tap(function(e) { 
+					simulateKeydown(37);
+				});
+				$("#control div.move-down").tap(function(e) { 
+					simulateKeydown(40);
+				});
+				$("#control div.rotate").tap(function(e) { 
+					simulateKeydown(83);
+				});
+				$("#control div.pause").tap(function(e) { 
+					simulateKeydown(27);
+				});
+				$("#control div.view-next").tap(function(e) { 
+					simulateKeydown(46);
+				});
+				
+				function simulateKeydown(code) { 
+					var e = jQuery.Event("keydown");
+					e.keyCode = code;
+					jQuery('body').trigger(e);
+				}
+				
 				$("body").keydown(function(e) { 
 					if ( $("#help").css("display") !== "none" ) { 
 						$('#help').fadeOut("slow");
@@ -223,26 +268,40 @@
 					} else { 				
 						if ( $("#panel").css("display") === "none" ) { 
 							if ( ENTER_NAME_TIMER > -1 ) { 
-								if (e.keyCode === 8 && ENTER_NAME_POSITION > 0) { 
-									ENTER_NAME_POSITION --;
-									var n = $('#home #name' + ENTER_NAME).html();
-									n = n.replaceAt(ENTER_NAME_POSITION, ENTER_NAME_DEFAULT_CHAR);
-									$('#home #name' + ENTER_NAME).html(n);
-								} else if (e.keyCode >= 65 && e.keyCode <= 90 && ENTER_NAME_POSITION < ENTER_NAME_MAX_CHAR) { 
-									var n = $('#home #name' + ENTER_NAME).html();
-									n = n.replaceAt(ENTER_NAME_POSITION, String.fromCharCode(e.keyCode));
-									$('#home #name' + ENTER_NAME).html(n);
-									ENTER_NAME_POSITION ++;
-								} else if (e.keyCode === 13) { 
-									var n = $('#home #name' + ENTER_NAME).html();
-									$('#home #name' + ENTER_NAME).html(n.split(ENTER_NAME_DEFAULT_CHAR).join(''));
-									eval('SCORE_' + ENTER_NAME + '_NAME = n.split("' + ENTER_NAME_DEFAULT_CHAR + '").join("");');
-									clearInterval(ENTER_NAME_TIMER);
-									$('#home #position' + ENTER_NAME + ', #home #score' + ENTER_NAME + ', #home #name' + ENTER_NAME).removeClass("invisible");
-									ENTER_NAME = -1;
-									ENTER_NAME_TIMER = -1;
-									ENTER_NAME_POSITION = 0;
-									home();
+								if ( $("#control").css("display") === "none" ) { 
+									if (e.keyCode === 8 && ENTER_NAME_POSITION > 0) { 
+										ENTER_NAME_POSITION --;
+										var n = $('#home #name' + ENTER_NAME).html();
+										n = n.replaceAt(ENTER_NAME_POSITION, ENTER_NAME_DEFAULT_CHAR);
+										$('#home #name' + ENTER_NAME).html(n);
+									} else if (e.keyCode >= 65 && e.keyCode <= 90 && ENTER_NAME_POSITION < ENTER_NAME_MAX_CHAR) { 
+										var n = $('#home #name' + ENTER_NAME).html();
+										n = n.replaceAt(ENTER_NAME_POSITION, String.fromCharCode(e.keyCode));
+										$('#home #name' + ENTER_NAME).html(n);
+										ENTER_NAME_POSITION ++;
+									} else if (e.keyCode === 13) { 
+										var n = $('#home #name' + ENTER_NAME).html();
+										$('#home #name' + ENTER_NAME).html(n.split(ENTER_NAME_DEFAULT_CHAR).join(''));
+										eval('SCORE_' + ENTER_NAME + '_NAME = n.split("' + ENTER_NAME_DEFAULT_CHAR + '").join("");');
+										clearInterval(ENTER_NAME_TIMER);
+										$('#home #position' + ENTER_NAME + ', #home #score' + ENTER_NAME + ', #home #name' + ENTER_NAME).removeClass("invisible");
+										ENTER_NAME = -1;
+										ENTER_NAME_TIMER = -1;
+										ENTER_NAME_POSITION = 0;
+										home();
+									}
+								} else { 
+									if (e.keyCode === 13) { 
+										eval('SCORE_' + ENTER_NAME + '_NAME = $("#name-input").val()');
+										$('#home #name' + ENTER_NAME).html($("#name-input").val());
+										clearInterval(ENTER_NAME_TIMER);
+										$('#home #position' + ENTER_NAME + ', #home #score' + ENTER_NAME + ', #home #name' + ENTER_NAME).removeClass("invisible");
+										$('#home #name' + ENTER_NAME).find('input').remove();
+										ENTER_NAME = -1;
+										ENTER_NAME_TIMER = -1;
+										ENTER_NAME_POSITION = 0;
+										home();
+									}
 								}
 							} else { 
 								game();
@@ -251,7 +310,7 @@
 							if (GAME_OVER) { 
 								home();
 							} else { 
-								if ( (e.keyCode === 27 || e.keyCode === 19 || e.keyCode === 13 || e.keyCode === 80) && GAME_SPECIAL_AUTHORIZED) { 
+								if ((e.keyCode === 27 || e.keyCode === 19 || e.keyCode === 13 || e.keyCode === 80) && GAME_SPECIAL_AUTHORIZED) { 
 									pause();
 								}
 							
@@ -268,8 +327,10 @@
 									var m = getPieceControlRotate();
 											
 									if (e.keyCode === 40) { 
+										if ($("#control").css("display") === "none") { 
+											PLAYER_SCORE_BONUS ++;
+										}
 										y --;
-										PLAYER_SCORE_BONUS ++;
 										pieceDown();
 									} else { 							
 										if (e.keyCode === 39) { 
@@ -361,6 +422,15 @@
 				</span>
 			</div>
 			<div class="help-button">- help -</div>
+		</div>
+	
+		<div id="control">
+			<div class="move-left"></div>
+			<div class="move-right"></div>
+			<div class="move-down"></div>
+			<div class="rotate"></div>
+			<div class="pause"></div>
+			<div class="view-next"></div>
 		</div>
 	
 	</body>

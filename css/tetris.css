@@ -31,14 +31,16 @@ html, body {
 	padding: 0px 0px 0px 0px;
 	width: 100%;
 	height: 100%;
-	background-color: #fff;
+	background-color: transparent;
 }
-body { 
+html  { 
 	background-image: url('../img/bg.jpg');
 	background-repeat: no-repeat;
 	background-position: 0% 0%;
 	background-size: cover;
 	background-attachment: fixed;
+}
+body { 
 	position: relative;
 }
 
@@ -71,6 +73,59 @@ body {
 	height: 100px;
 	border-color: #000;
 }
+#control { 
+	position: absolute;
+	width: 460px;
+	height: 160px;
+	width: 460px;
+	margin: auto;
+	margin-top: 740px;
+	left: 0px;
+	right: 0px;
+	background-color: #999;
+	border: solid 0px #ccc;
+	opacity: 0.8;
+	display: none;
+}
+#control div { 
+	width: 70px;
+	height: 70px;
+	position: absolute;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-size: cover;
+	cursor: pointer;
+}
+#control div.move-left { 
+	background-image: url('../img/move-left.png');
+	top: 30px;
+	right: 160px;
+}
+#control div.move-right { 
+	background-image: url('../img/move-right.png');
+	top: 30px;
+	right: 20px;
+}
+#control div.move-down { 
+	background-image: url('../img/move-down.png');
+	top: 80px;
+	right: 90px;
+}
+#control div.rotate { 
+	background-image: url('../img/rotate.png');
+	top: 10px;
+	right: 90px;
+}
+#control div.pause { 
+	background-image: url('../img/pause.png');
+	top: 30px;
+	left: 20px;
+}
+#control div.view-next { 
+	background-image: url('../img/next.png');
+	top: 30px;
+	left: 100px;
+}
 #level, #lines, #score, #next { 
 	float: left;
 	position: relative;
@@ -101,11 +156,11 @@ body {
 	position: relative;
 	background-color: #000;
 	border: solid 1px #000;
-	display: inline-table;
+	display: inline-block;
+	float: left;
 	margin: 0px;
 	padding: 0px;
-	float: left;
-	font-size: 14px;
+	font-size: 12px;
 	text-align: center;
 }
 .square.disabled { 
@@ -177,6 +232,7 @@ h1 {
 	letter-spacing: 10px;
 	text-transform: uppercase;
 	font-weight: bold;
+	
 	background: -webkit-linear-gradient(#5698f8, #e446c6, #fcba40, #fff);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
@@ -193,7 +249,6 @@ h2 {
 	-webkit-text-stroke-width: 5px;
 }
 #home h2 { 
-
 	font-weight: bold;
 	margin: -20px 0px 0px 0px;
 	font-size: 22px;
@@ -286,4 +341,153 @@ h2 {
 }
 #help  table  tr  td:last-child { 
 	text-align: left;
+}
+
+#name-input { 
+	z-index: 999999;
+	color: #ffedb3;
+	background-color: transparent;
+	font-size: 20px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	border: solid 1px #f4c030;
+    outline: none;
+	padding: 1px 6px 1px 6px;
+	margin: 0px;
+}
+
+.ui-mobile {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+
+
+@media screen and (max-width:1024px), screen and (min-device-width : 768px) and (max-device-width : 1024px) { 
+	.help-button { display: none; }
+	#control { display: inline; } 
+}
+@media screen and (max-width:480px), screen and (min-device-width : 320px) and (max-device-width : 480px) { 
+	.help-button { display: none; }
+	#control { display: inline; } 
+	
+	h1 { 
+		font-size: 30px;
+		letter-spacing: 5px;
+		-webkit-text-stroke-width: 1px;
+	}
+	
+	#home h1 { 
+		font-size: 64px;
+		-webkit-text-stroke-width: 1px;
+	}
+	#home h2 { 
+		margin: -5px 0px 0px 0px;
+		font-size: 14px;
+		letter-spacing: 1px;
+	}
+	#home h3 { 
+		font-size: 12px;
+	}
+	
+	#board .message, .start { 
+		font-size: 14px;
+		height: 25px;
+	}
+	
+	#scores { 
+		top: 185px;
+	}
+	#scores  h2, #help h2 { 
+		margin: 0px 0px 10px 0px;
+		font-size: 14px;
+	}
+	#scores  table  th, #scores  table  td { 
+		padding: 0px 10px 0px 10px;
+		font-size: 10px;
+		text-align: right;
+	}
+	#name-input { 
+		font-size: 10px;
+		padding: 0px 4px 0px 4px;
+	}
+	
+	#panel, #home { 
+		width: 270px;
+		height: 300px;
+		margin-top: 10px;
+		padding: 10px;
+	}
+	
+	#board { 
+		width: 140px;
+		height: 252px;
+	}
+	#board-next { 
+		width: 60px;
+		height: 64px;
+	}
+	#level, #lines, #score, #next { 
+		width: 100px;
+		height: 39px;
+		font-size: 10px;
+		padding-left: 10px;
+		margin-bottom: 15px;
+		margin-left: 2px;
+	}
+	#panel h2 {
+		font-size: 12px;
+	}
+	#next { 
+		margin-bottom: 0px;
+		height: 86px;
+	}
+	#level span, #lines span, #score span { 
+		font-size: 14px;
+		padding-left: 10px;
+	}
+
+	.square { 
+		width: 12px;
+		height: 12px;
+	}
+	
+	#control { 
+		position: absolute;
+		width: 260px;
+		height: 40px;
+		margin-top: 345px;
+	}
+	#control div { 
+		width: 36px;
+		height: 36px;
+	}
+	#control div.move-left { 
+		top: 2px;
+		right: 45px;
+	}
+	#control div.move-right { 
+		top: 2px;
+		right: 5px;
+	}
+	#control div.move-down { 
+		top: 2px;
+		right: 95px;
+	}
+	#control div.rotate { 
+		top: 2px;
+		right: 130px;
+	}
+	#control div.pause { 
+		top: 2px;
+		left: 5px;
+	}
+	#control div.view-next { 
+		top: 2px;
+		left: 45px;
+	}
 }
