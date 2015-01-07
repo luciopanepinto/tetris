@@ -209,6 +209,7 @@
 				home();
 				
 				$(".help-button, #help").click(function(e) { 
+					e.stopPropagation();
 					if ( $('#help').css("display") === "none") { 
 						$('#help').fadeIn("slow");
 						$(".help-button").hide();
@@ -230,28 +231,44 @@
 				});
 				
 				$("#home, #panel #board").tap(function(e) { 
-					simulateKeydown(13);
+					e.preventDefault();
+					simulateKeydown(83);
+				});
+				$("#panel #board").swipeleft(function(e) { 
+					e.preventDefault();
+					simulateKeydown(37);
+				});
+				$("#panel #board").swiperight(function(e) { 
+					e.preventDefault();
+					simulateKeydown(39);
 				});
 				$("#board-next").tap(function(e) { 
+					e.preventDefault();
 					simulateKeydown(46);
 				});
 				
 				$("#control div.move-right").tap(function(e) { 
+					e.preventDefault();
 					simulateKeydown(39);
 				});
 				$("#control div.move-left").tap(function(e) { 
+					e.preventDefault();
 					simulateKeydown(37);
 				});
 				$("#control div.move-down").tap(function(e) { 
+					e.preventDefault();
 					simulateKeydown(40);
 				});
 				$("#control div.rotate").tap(function(e) { 
+					e.preventDefault();
 					simulateKeydown(83);
 				});
 				$("#control div.pause").tap(function(e) { 
+					e.preventDefault();
 					simulateKeydown(27);
 				});
 				$("#control div.view-next").tap(function(e) { 
+					e.preventDefault();
 					simulateKeydown(46);
 				});
 				
