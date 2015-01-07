@@ -1,4 +1,9 @@
 function refreshPlayer() { 
+	if (PLAYER_SCORE > PLAYER_SCORE_MAXIMUM) { 
+		PLAYER_SCORE = PLAYER_SCORE_MAXIMUM;
+		gameover();
+	}
+
 	$("#level span").html(PLAYER_LEVEL);
 	$("#lines span").html(commafy(PLAYER_LINES));
 	$("#score span").html(commafy(PLAYER_SCORE));
@@ -35,10 +40,10 @@ function refreshHighScores() {
 	
 	if ( $("#control").css("display") !== "none" ) { 
 		$("#name" + ENTER_NAME).html('<input type="text" id="name-input" name="name-input" size="10" maxlength="7">');
-		setTimeout(function() { $('#name-input').get(0).focus() }, 2000);
 		$("#name-input").tap(function(e) { 
 			e.stopPropagation();
 		});
+		setTimeout(function() { $('#name-input').get(0).focus() }, 2500);
 	}
 }
 

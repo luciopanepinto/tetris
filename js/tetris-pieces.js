@@ -106,9 +106,11 @@ function launchOnePiece() {
 
 function nextMasked() { 
 	if (PIECE_NEXT_MASKED) { 
+		$("#control div.view-next").addClass("not");
 		$('#board-next').find(".square").removeClass("masked");
 		PIECE_NEXT_MASKED = false;
 	} else { 
+		$("#control div.view-next").removeClass("not");
 		$('#board-next').find(".square").addClass("masked");
 		PIECE_NEXT_MASKED = true;
 	}
