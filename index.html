@@ -226,6 +226,8 @@
 				}
 				
 				$("body").keydown(function(e) { 
+					e.preventDefault();
+					e.stopPropagation();
 					if ( $("#help").css("display") !== "none" ) { 
 						$('#help').fadeOut("slow");
 						$(".help-button").show();
@@ -321,7 +323,7 @@
 			});
 		</script>
 	
-		<title>Tetris</title>
+		<title>Lucio PANEPINTO - Tetris</title>
 	</head>
 		
 	<body>
