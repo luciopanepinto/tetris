@@ -158,6 +158,12 @@ body {
 	padding-left: 15px;
 }
 
+.github { 
+	position: absolute;
+	bottom: 0px;
+	left: 5px;
+}
+
 .square { 
 	width: 23px;
 	height: 23px;
@@ -376,11 +382,11 @@ h2 {
 
 
 @media screen and (max-width:1024px), screen and (min-device-width : 768px) and (max-device-width : 1024px) { 
-	.help-button { display: none; }
+	.help-button, .github { display: none; }
 	#control { display: inline; } 
 }
 @media screen and (max-width:480px), screen and (min-device-width : 320px) and (max-device-width : 480px) { 
-	.help-button { display: none; }
+	.help-button, .github { display: none; }
 	#control { display: inline; } 
 	
 	h1 { 

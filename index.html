@@ -173,6 +173,10 @@
 						$(".help-button").show();
 					}
 				});
+				
+				$(".github").click(function(e) { 
+					e.stopPropagation();
+				});
 
 				$("body").keyup(function(e) { 
 					if ( $("#panel").css("display") !== "none") { 
@@ -369,6 +373,7 @@
 				</table>
 			</div>
 			<div class="help-button">- help -</div>
+			<a class="github" target="_blank" href="https://github.com/luciopanepinto/tetris"><img src="img/github.png" alt="GitHub - Lucio PANEPINTO - Tetris"></a>
 		</div>
 	
 		<div id="panel">
