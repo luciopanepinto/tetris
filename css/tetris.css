@@ -310,10 +310,19 @@ h2 {
 	color: #ffedb3;
 }
 
+.sound { 
+	position: absolute;
+	bottom: 0px;
+	right: 10px;
+}
+.sound img { 
+	height: 28px;
+}
+
 .help-button { 
 	position: absolute;
 	bottom: 5px;
-	right: 10px;
+	right: 55px;
 	font-size: 16px;
 	font-weight: bold;
 	text-transform: lowercase;
@@ -382,11 +391,11 @@ h2 {
 
 
 @media screen and (max-width:1024px), screen and (min-device-width : 768px) and (max-device-width : 1024px) { 
-	.help-button, .github { display: none; }
+	.help-button, .github, #sound, .sound { display: none; }
 	#control { display: inline; } 
 }
 @media screen and (max-width:480px), screen and (min-device-width : 320px) and (max-device-width : 480px) { 
-	.help-button, .github { display: none; }
+	.help-button, .github, #sound, .sound { display: none; }
 	#control { display: inline; } 
 	
 	h1 { 

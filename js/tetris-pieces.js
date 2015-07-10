@@ -54,6 +54,8 @@ function pieceDown() {
 		clearInterval(PIECE_DOWN_TIMER);
 		PIECE_DOWN_TIMER = -1;
 		PIECE_CONTROL = "NULL";
+		
+		playDropSound();
 		scanLines();
 	}
 }

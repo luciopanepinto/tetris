@@ -17,11 +17,13 @@
 	
 		<script type="text/javascript" src="js/jquery.js"></script>
 		<script type="text/javascript" src="js/jquery-mobile.js"></script>
+		<script type="text/javascript" src="js/jquery-buzz.js"></script>
 		<script type="text/javascript" src="js/tetris-vars.js"></script>
 		<script type="text/javascript" src="js/tetris-tools.js"></script>
 		<script type="text/javascript" src="js/tetris-pieces.js"></script>
 		<script type="text/javascript" src="js/tetris-lines.js"></script>
 		<script type="text/javascript" src="js/tetris-score.js"></script>
+		<script type="text/javascript" src="js/tetris-sound.js"></script>
 		
 		<script type="text/javascript">		
 		
@@ -62,6 +64,9 @@
 			}
 			
 			function gameover() { 
+				stopAllSound();
+				playGameoverSound();
+			
 				GAME_SPECIAL_AUTHORIZED = false;
 				PIECE_CONTROL = "NULL";
 				
@@ -76,6 +81,7 @@
 					$('#board, #board-next').find(".square").removeClass("invisible");
 					clearMessage();
 					GAME_PAUSE = false;
+					playThemeSound();
 					PIECE_DOWN_TIMER = setInterval('pieceDown()', PLAYER_SPEED);
 					if (LINES !== "") { 
 						LINES_BLINK_TIMER = setInterval('blinkLines()', LINES_BLINK_DELAY);
@@ -84,6 +90,7 @@
 					$("#control div.pause").addClass("play");
 					message("pause");
 					GAME_PAUSE = true;
+					pauseThemeSound();
 					clearInterval(PIECE_DOWN_TIMER);
 					if (LINES !== "") { 
 						clearInterval(LINES_BLINK_TIMER);
@@ -137,10 +144,13 @@
 					ENTER_NAME_TIMER = setInterval('blinkName()', ENTER_NAME_DELAY);
 				} else { 
 					GAME_START_TIMER = setInterval('blinkStart()', GAME_START_DELAY);
+					playThemeSound();
 				}
 			}
 			
 			function game() { 
+				playMoveSound();
+			
 				$("#home").hide();
 				$("#panel").show();
 				
@@ -152,9 +162,27 @@
 			
 			$(document).ready(function() { 
 				$.mobile.loading().hide();
+				
+				loadAllSound();
+				
 				if ($("#control").css("display") !== "none") { 
 					$("#home .start").html(" - Touch screen to start - ");
 				}
+				
+				$(".sound").click(function(e) { 
+					e.stopPropagation();
+					
+					var sound = $(this).attr("data-sound");
+					if ( sound === "on" ) { 
+						$(".sound").attr("data-sound", "off");
+						$(".sound").find("img").attr("src", "img/sound-off.png");
+						muteAllSound();
+					} else { 
+						$(".sound").attr("data-sound", "on");
+						$(".sound").find("img").attr("src", "img/sound-on.png");
+						unmuteAllSound();
+					}
+				});
 				
 				HELP_TIMER = setInterval('blinkHelp()', HELP_DELAY);
 				
@@ -243,6 +271,7 @@
 					} else { 				
 						if ( $("#panel").css("display") === "none" ) { 
 							if ( ENTER_NAME_TIMER > -1 ) { 
+								playMoveSound();
 								if ( $("#control").css("display") === "none" ) { 
 									if (e.keyCode === 8 && ENTER_NAME_POSITION > 0) { 
 										ENTER_NAME_POSITION --;
@@ -306,19 +335,30 @@
 											PLAYER_SCORE_BONUS ++;
 										}
 										y --;
+										playMoveSound();
 										pieceDown();
-									} else { 							
+									} else { 			
+
+										var moveSound = false;
+										var rotateSound = false;
 										if (e.keyCode === 39) { 
-											x ++;
+											x ++; moveSound = true;
 										} else if (e.keyCode === 37) { 
-											x --;
+											x --; moveSound = true;
 										} else if (e.keyCode === 83 || e.keyCode === 38 || e.keyCode === 17 || e.keyCode === 32) { 
-											m ++; if (m > 4) m = 1;
+											m ++; if (m > 4) m = 1; rotateSound = true;
 										} else if (e.keyCode === 81 || e.keyCode === 65) { 
-											m --; if (m < 1) m = 4;
+											m --; if (m < 1) m = 4; rotateSound = true;
 										}
 
 										if (canMove(p, x, y, m, PIECE_CONTROL)) { 
+											
+											if (moveSound) { 
+												playMoveSound();
+											} else if (rotateSound) { 
+												playRotateSound();
+											}
+										
 											$('#board').find(".square[piece-id='" + PIECE_CONTROL + "']").removeClass("piece" + p).removeAttr("piece-id").removeAttr("piece-catch").removeAttr("piece-move");
 											drawPiece(p, x, y, m, PIECE_CONTROL);
 											$('#board').find(".square[piece-id='" + PIECE_CONTROL + "'][piece-catch='yes']").attr("piece-move", m);
@@ -373,6 +413,7 @@
 				</table>
 			</div>
 			<div class="help-button">- help -</div>
+			<a class="sound" href="javascript:void(0);" data-sound="on"><img src="img/sound-on.png" alt="" border="0"></a>
 			<a class="github" target="_blank" href="https://github.com/luciopanepinto/tetris"><img src="img/github.png" alt="GitHub - Lucio PANEPINTO - Tetris"></a>
 		</div>
 	
@@ -398,6 +439,7 @@
 				</span>
 			</div>
 			<div class="help-button">- help -</div>
+			<a class="sound" href="javascript:void(0);" data-sound="on"><img src="img/sound-on.png" alt="" border="0"></a>
 		</div>
 	
 		<div id="control">

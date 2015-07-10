@@ -19,6 +19,12 @@ function scanLines() {
 	
 	if (LINES !== "") { 
 		LINES_BLINK_TIMER = setInterval('blinkLines()', LINES_BLINK_DELAY);
+		if ( LINES.split(",").length < 4 ) { 
+			playLineSound();
+		} else { 
+			playTetrisSound();
+		}
+		
 	} else { 
 		launchOnePiece();
 	}
